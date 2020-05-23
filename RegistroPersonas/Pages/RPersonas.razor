@@ -1,0 +1,113 @@
+﻿@page "/Personas"
+@page  "/Datos"
+@using RegistroPersonas.Models
+@using RegistroPersonas.BLL
+
+
+@inject IToastService toast
+<h3>Registros De Personas</h3>
+<EditForm Model="persona" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <label for="Id">ID </label>
+    <div class="input-group">
+        <InputNumber @bind-Value="persona.IdPersona" class="form-control"> </InputNumber>
+        <ValidationMessage For="(()=>persona.IdPersona)"></ValidationMessage>
+        <div class="input-group-append">
+            <button type="button" class="btn btn-primary" @onclick="Buscar">Buscar<span class="oi-share"></span></button>
+
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label for="Nombres">Nombres</label>
+        <InputText @bind-Value="persona.Nombres" class="form-control"></InputText>
+        <ValidationMessage For="(()=>persona.Nombres)"></ValidationMessage>
+
+    </div>
+    <div class="form-group">
+        <label for="Telefono">Telefono</label>
+        <InputText @bind-Value="persona.Telefono" class="form-control"></InputText>
+        <ValidationMessage For="(()=>persona.Telefono)"></ValidationMessage>
+    </div>
+    <div class="form-group">
+        <label for="Cedula">Cedula</label>
+        <InputText @bind-Value="persona.Cedula" class="form-control"></InputText>
+        <ValidationMessage For="(()=>persona.Cedula)"></ValidationMessage>
+    </div>
+    <div class="form-group">
+        <label for="Direccion">Direccion</label>
+        <InputText @bind-Value="persona.Direccion" class="form-control"></InputText>
+        <ValidationMessage For="(()=>persona.Direccion)"></ValidationMessage>
+    </div>
+    <div class="form-group">
+        <label for="Fecha">Fecha de Nacimiento</label>
+        <InputDate @bind-Value="persona.FechaNacimiento" class="form-control"></InputDate>
+        <ValidationMessage For="(()=>persona.FechaNacimiento)"></ValidationMessage>
+
+    </div>
+    <div class="form-group">
+
+        <button type="button" class="btn btn-secondary" @onclick="Nuevo"> Nuevo </button>
+
+        <button type="submit" class="btn btn-success">Guardar </button>
+
+        <button type="button" class="btn btn-danger" @onclick="Eliminar"> Eliminar </button>
+
+    </div>
+
+</EditForm>
+
+@code {
+    public Persona persona { get; set; }
+    private void Nuevo()
+    {
+        persona = new Persona();
+    }
+    protected override void OnInitialized()
+    {
+        Nuevo();
+        Buscar();
+    }
+    private void Guardar()
+    {
+        bool paso;
+        paso = PersonasBLL.Guardar(persona);
+        if (paso)
+        {
+            Nuevo();
+            toast.ShowSuccess("Persona Guardada Correctamente");
+
+        }
+        else
+        {
+            toast.ShowSuccess("Error no se Guardo");
+        }
+    }
+    private void Buscar()
+    {
+        if (persona.IdPersona > 0)
+        {
+            var llena = PersonasBLL.Buscar(persona.IdPersona);
+            if (llena != null)
+            {
+                this.persona = llena;
+            }
+            else
+                toast.ShowSuccess("No existe Esta Persona");
+        }
+    }
+    private void Eliminar()
+    {
+        bool borrar;
+        borrar = PersonasBLL.Eliminar(persona.IdPersona);
+        if (borrar)
+        {
+            Nuevo();
+            toast.ShowSuccess("Persona Eliminada");
+        }
+        else
+        {
+            toast.ShowError("No existe la Persona que intento Eliminar");
+        }
+    }
+}
